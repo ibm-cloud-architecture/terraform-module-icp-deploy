@@ -174,12 +174,12 @@ resource "null_resource" "icp-image" {
       destination = "/tmp/${basename(var.image_file)}"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo \"Loading image ${var.icp-version}\"",
-      "/tmp/icp-bootmaster-scripts/load-image.sh ${var.icp-version} /tmp/${basename(var.image_file)} \"${var.image_location}\" "
-    ]
-  }
+  #provisioner "remote-exec" {
+    #inline = [
+     # "echo \"Loading image ${var.icp-version}\"",
+      #"/tmp/icp-bootmaster-scripts/load-image.sh ${var.icp-version} /tmp/${basename(var.image_file)} \"${var.image_location}\" "
+    #]
+ # }
 }
 
 
