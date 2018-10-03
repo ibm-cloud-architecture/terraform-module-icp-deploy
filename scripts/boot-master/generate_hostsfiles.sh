@@ -107,7 +107,7 @@ read_from_hostgroups() {
 
   # Generate the hostname/ip combination
   for node in "${cluster_ips[@]}"; do
-    cluster[$node]=$(ssh -o StrictHostKeyChecking=no -i ${WORKDIR}/ssh_key ${node} hostname)
+    cluster[$node]=$(ssh -o StrictHostKeyChecking=no -o ConnectionAttempts=100 -i ${WORKDIR}/ssh_key ${node} hostname)
     printf "%s     %s\n" "$node" "${cluster[$node]}" >> /tmp/hosts
   done
 
