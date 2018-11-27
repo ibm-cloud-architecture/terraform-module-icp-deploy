@@ -36,18 +36,18 @@ lvm2"
   if [ ! -z "${packages_to_install}" ]; then
     # attempt to install, probably won't work airgapped but we'll get an error immediately
     echo "Attempting to install: ${packages_to_install} ..."
-    sudo flock --timeout 60 --exclusive --close /var/lib/apt/lists/lock apt-get -y -o Dpkg::Options::="--force-confold" update
+    sudo apt-get update
     while [ $? -ne 0 ]; do
-      echo "Another process has f-locked /var/lib/apt/lists/lock" 1>&2
+      echo "Another process has acquired the apt-get update lock; waiting 10s" 1>&2
       sleep 10;
-      sudo flock --timeout 60 --exclusive --close /var/lib/apt/lists/lock apt-get -y -o Dpkg::Options::="--force-confold" update
+      sudo apt-get update
     done
 
-    sudo flock --timeout 60 --exclusive --close /var/lib/dpkg/lock apt-get -y -o Dpkg::Options::="--force-confold" install ${packages_to_install}
+    sudo apt-get install -y ${packages_to_install}
     while [ $? -ne 0 ]; do
-      echo "Another process has f-locked /var/lib/dpkg/lock" 1>&2
+      echo "Another process has acquired the apt-get install/upgrade; waiting 10s" 1>&2
       sleep 10;
-      sudo flock --timeout 60 --exclusive --close /var/lib/dpkg/lock apt-get -y -o Dpkg::Options::="--force-confold" install ${packages_to_install}
+      sudo apt-get install -y ${packages_to_install}
     done
   fi
 }
