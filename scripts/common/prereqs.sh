@@ -36,18 +36,18 @@ lvm2"
   if [ ! -z "${packages_to_install}" ]; then
     # attempt to install, probably won't work airgapped but we'll get an error immediately
     echo "Attempting to install: ${packages_to_install} ..."
-    flock --timeout 60 --exclusive --close /var/lib/apt/lists/lock apt-get -y -o Dpkg::Options::="--force-confold" update
+    sudo flock --timeout 60 --exclusive --close /var/lib/apt/lists/lock apt-get -y -o Dpkg::Options::="--force-confold" update
     while [ $? -ne 0 ]; do
       echo "Another process has f-locked /var/lib/apt/lists/lock" 1>&2
       sleep 10;
-      flock --timeout 60 --exclusive --close /var/lib/apt/lists/lock apt-get -y -o Dpkg::Options::="--force-confold" update
+      sudo flock --timeout 60 --exclusive --close /var/lib/apt/lists/lock apt-get -y -o Dpkg::Options::="--force-confold" update
     done
 
-    flock --timeout 60 --exclusive --close /var/lib/dpkg/lock apt-get -y -o Dpkg::Options::="--force-confold" install ${packages_to_install}
+    sudo flock --timeout 60 --exclusive --close /var/lib/dpkg/lock apt-get -y -o Dpkg::Options::="--force-confold" install ${packages_to_install}
     while [ $? -ne 0 ]; do
       echo "Another process has f-locked /var/lib/dpkg/lock" 1>&2
       sleep 10;
-      flock --timeout 60 --exclusive --close /var/lib/dpkg/lock apt-get -y -o Dpkg::Options::="--force-confold" install ${packages_to_install}
+      sudo flock --timeout 60 --exclusive --close /var/lib/dpkg/lock apt-get -y -o Dpkg::Options::="--force-confold" install ${packages_to_install}
     done
   fi
 }
