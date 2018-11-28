@@ -259,6 +259,10 @@ To avoid breaking existing templates which depends on the module it is recommend
 
 
 ### Versions and changes
+#### 2.3.6
+- Retry ssh from boot to cluster nodes when generating /etc/hosts entries. Fixes issues when some cluster nodes are provisioned substantially slower.
+- Report exit code from docker when running ansible installer, rather than the last command in the pipelist (tee)
+
 #### 2.3.5
 - Skip blanks when generating config.yaml as yaml.safe_dump exports them as '' which ansible installer doesn't like
 
