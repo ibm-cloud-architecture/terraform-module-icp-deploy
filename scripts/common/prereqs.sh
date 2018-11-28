@@ -36,19 +36,31 @@ lvm2"
   if [ ! -z "${packages_to_install}" ]; then
     # attempt to install, probably won't work airgapped but we'll get an error immediately
     echo "Attempting to install: ${packages_to_install} ..."
+    retries=20
     sudo apt-get update
-    while [ $? -ne 0 ]; do
+    while [ $? -ne 0 -a "$retries" -gt 0 ]; do
+      retries=$((retries-1))
       echo "Another process has acquired the apt-get update lock; waiting 10s" 1>&2
       sleep 10;
       sudo apt-get update
     done
+    if [ $? -ne 0 -a "$retries" -eq 0 ] ; then
+      echo "Maximum number of retries (20) for apt-get update attempted; quitting" 1>&2
+      exit 1
+    fi
 
+    retries=20
     sudo apt-get install -y ${packages_to_install}
-    while [ $? -ne 0 ]; do
-      echo "Another process has acquired the apt-get install/upgrade; waiting 10s" 1>&2
+    while [ $? -ne 0 -a "$retries" -gt 0 ]; do
+      retries=$((retries-1))
+      echo "Another process has acquired the apt-get install/upgrade lock; waiting 10s" 1>&2
       sleep 10;
       sudo apt-get install -y ${packages_to_install}
     done
+    if [ $? -ne 0 -a "$retries" -eq 0 ] ; then
+      echo "Maximum number of retries (20) for apt-get install attempted; quitting" 1>&2
+      exit 1
+    fi
   fi
 }
 
