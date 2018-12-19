@@ -16,7 +16,7 @@ echo "Got second parameter $3"
 docker_version=$3
 sourcedir=/tmp/icp-docker
 
-if [[ -z "${docker_version}" -eq "latest" ]]
+if [ -z "${docker_version}" -eq "latest" ];
 then
   docker_version=""
 else
