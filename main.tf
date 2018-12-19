@@ -367,6 +367,104 @@ resource "null_resource" "icp-preinstall-hook-stop-on-fail" {
     on_failure = "fail"
   }
 }
+
+################ CRISTIE FIX ################
+# Local preinstall hook
+
+## Cluster Pre-config hook
+resource "null_resource" "icp-cluster-preconfig-hook" {
+  count = "${contains(keys(var.hooks), "cluster-preconfig") ? var.cluster_size : 0}"
+
+  connection {
+      host          = "${element(local.icp-ips, count.index)}"
+      user          = "${var.ssh_user}"
+      private_key   = "${local.ssh_key}"
+      agent         = "${var.ssh_agent}"
+      bastion_host  = "${var.bastion_host}"
+  }
+
+  # Run cluster-preconfig commands
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hooks["cluster-preconfig"]}"
+    ]
+  }
+}
+
+## Cluster postconfig hook
+resource "null_resource" "icp-cluster-postconfig-hook" {
+  depends_on = ["null_resource.icp-cluster"]
+  count = "${contains(keys(var.hooks), "cluster-postconfig") ? var.cluster_size : 0}"
+
+  connection {
+      host          = "${element(local.icp-ips, count.index)}"
+      user          = "${var.ssh_user}"
+      private_key   = "${local.ssh_key}"
+      agent         = "${var.ssh_agent}"
+      bastion_host  = "${var.bastion_host}"
+  }
+
+  # Run cluster-postconfig commands
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hooks["cluster-postconfig"]}"
+    ]
+  }
+}
+
+resource "null_resource" "icp-preinstall-hook" {
+  depends_on = ["null_resource.icp-generate-hosts-files"]
+  count = "${contains(keys(var.hooks), "preinstall") ? 1 : 0}"
+
+  # The first master is always the boot master where we run provisioning jobs from
+  connection {
+    host          = "${local.boot-node}"
+    user          = "${var.ssh_user}"
+    private_key   = "${local.ssh_key}"
+    agent         = "${var.ssh_agent}"
+    bastion_host  = "${var.bastion_host}"
+  }
+
+  # Run stage hook commands
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hooks["preinstall"]}"
+    ]
+  }
+}
+
+resource "null_resource" "icp-boot-preconfig" {
+  depends_on = ["null_resource.icp-cluster-postconfig-hook", "null_resource.icp-cluster"]
+  count = "${contains(keys(var.hooks), "boot-preconfig") ? 1 : 0}"
+
+  # The first master is always the boot master where we run provisioning jobs from
+  connection {
+    host          = "${local.boot-node}"
+    user          = "${var.ssh_user}"
+    private_key   = "${local.ssh_key}"
+    agent         = "${var.ssh_agent}"
+    bastion_host  = "${var.bastion_host}"
+  }
+
+  # Run stage hook commands
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hooks["boot-preconfig"]}"
+    ]
+  }
+}
+
+
+resource "null_resource" "local-preinstall-hook" {
+  depends_on = ["null_resource.icp-preinstall-hook"]
+  provisioner "local-exec" {
+    command = "${var.hooks["local-preinstall"]}"
+  }
+
+}
+
+################ CRISTIE FIX ################
+
 resource "null_resource" "icp-preinstall-hook-continue-on-fail" {
   depends_on = ["null_resource.icp-generate-hosts-files"]
   count = "${var.on_hook_failure != "fail" ? 1 : 0}"
