@@ -16,35 +16,12 @@ echo "Got second parameter $3"
 docker_version=$3
 sourcedir=/tmp/icp-docker
 
-if [ -z "${docker_version}" -eq "latest" ];
+if [[ -z "${docker_version}" -eq "latest" ]]
 then
   docker_version=""
 else
   docker_version="=${docker_version}"
-fi 
-
-function rhel_docker_install {
-  # Process for RedHat VMs
-  echo "Update RedHat or CentOS with latest patches"
-
-  # Add the Extra Repo from RedHat to be able to support extra tools that needed
-  subscription-manager repos --enable=rhel-7-server-extras-rpms
-  sudo yum update -y
-
-  # Installing nesscarry tools for ICP to work including Netstat for tracing
-  sudo yum install -y net-tools yum-utils device-mapper-persistent-data lvm2
-
-  # Register Docker Community Edition repo for CentOS and RedHat
-  sudo yum-config-manager  --add-repo  https://download.docker.com/linux/centos/docker-ce.re
-  sudo yum install -y docker-ce
-
-  # Make sure our user is added to the docker group if needed
-  /tmp/icp-common-scripts/docker-user.sh
-
-  # Start Docker locally on the host
-  sudo systemctl enable docker
-  sudo systemctl start docker
-}
+fi
 
 # TODO: Deal with installation from apt repository for linux
 # Figure out if we're asked to install at all
@@ -141,7 +118,26 @@ if [[ "${OSLEVEL}" == "ubuntu" ]]
 
 elif [[ "${OSLEVEL}" == "redhat" ]]
   then
-    rhel_docker_install
+    # Process for RedHat VMs
+    echo "Update RedHat or CentOS with latest patches"
+
+    # Add the Extra Repo from RedHat to be able to support extra tools that needed
+    subscription-manager repos --enable=rhel-7-server-extras-rpms
+    sudo yum update -y
+
+    # Installing nesscarry tools for ICP to work including Netstat for tracing
+    sudo yum install -y net-tools yum-utils device-mapper-persistent-data lvm2
+
+    # Register Docker Community Edition repo for CentOS and RedHat
+    sudo yum-config-manager  --add-repo  https://download.docker.com/linux/centos/docker-ce.re
+    sudo yum install -y docker-ce
+
+    # Make sure our user is added to the docker group if needed
+    /tmp/icp-common-scripts/docker-user.sh
+
+    # Start Docker locally on the host
+    sudo systemctl enable docker
+    sudo systemctl start docker
     exit 0
 
 else
