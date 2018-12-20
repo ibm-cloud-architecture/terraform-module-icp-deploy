@@ -273,6 +273,12 @@ To avoid breaking existing templates which depends on the module it is recommend
 
 
 ### Versions and changes
+#### 2.4.2
+- Added support to be able to deploy ICP 3.1.1 on RedHat and CentOS. (Tested only on ICP 3.1.1-CE with CentOS 7)
+
+#### 2.4.1
+- Added missed prereq in the main.tf file
+
 #### 2.4.0
 - Add support for local hooks
 - Support specifying docker version when installing docker with apt (Ubuntu only)
