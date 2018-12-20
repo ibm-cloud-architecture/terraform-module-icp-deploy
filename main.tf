@@ -1,4 +1,3 @@
-
 # Generate a new key if this is required
 resource "tls_private_key" "icpkey" {
   # count       = "${var.generate_key ? 1 : 0}" # Generate the key anyways, since the output logic needs it for interpolation
@@ -8,6 +7,101 @@ resource "tls_private_key" "icpkey" {
     command = "cat > privatekey.pem <<EOL\n${tls_private_key.icpkey.private_key_pem}\nEOL"
   }
 }
+
+#### Start of Prereq for 2.4.0 ####
+## Cluster Pre-config hook
+resource "null_resource" "icp-cluster-preconfig-hook" {
+  count = "${contains(keys(var.hooks), "cluster-preconfig") ? var.cluster_size : 0}"
+
+  connection {
+      host          = "${element(local.icp-ips, count.index)}"
+      user          = "${var.ssh_user}"
+      private_key   = "${local.ssh_key}"
+      agent         = "${var.ssh_agent}"
+      bastion_host  = "${var.bastion_host}"
+  }
+
+  # Run cluster-preconfig commands
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hooks["cluster-preconfig"]}"
+    ]
+  }
+}
+
+## Cluster postconfig hook
+resource "null_resource" "icp-cluster-postconfig-hook" {
+  depends_on = ["null_resource.icp-cluster"]
+  count = "${contains(keys(var.hooks), "cluster-postconfig") ? var.cluster_size : 0}"
+
+  connection {
+      host          = "${element(local.icp-ips, count.index)}"
+      user          = "${var.ssh_user}"
+      private_key   = "${local.ssh_key}"
+      agent         = "${var.ssh_agent}"
+      bastion_host  = "${var.bastion_host}"
+  }
+
+  # Run cluster-postconfig commands
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hooks["cluster-postconfig"]}"
+    ]
+  }
+}
+
+resource "null_resource" "icp-preinstall-hook" {
+  depends_on = ["null_resource.icp-generate-hosts-files"]
+  count = "${contains(keys(var.hooks), "preinstall") ? 1 : 0}"
+
+  # The first master is always the boot master where we run provisioning jobs from
+  connection {
+    host          = "${local.boot-node}"
+    user          = "${var.ssh_user}"
+    private_key   = "${local.ssh_key}"
+    agent         = "${var.ssh_agent}"
+    bastion_host  = "${var.bastion_host}"
+  }
+
+  # Run stage hook commands
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hooks["preinstall"]}"
+    ]
+  }
+}
+
+resource "null_resource" "icp-boot-preconfig" {
+  depends_on = ["null_resource.icp-cluster-postconfig-hook", "null_resource.icp-cluster"]
+  count = "${contains(keys(var.hooks), "boot-preconfig") ? 1 : 0}"
+
+  # The first master is always the boot master where we run provisioning jobs from
+  connection {
+    host          = "${local.boot-node}"
+    user          = "${var.ssh_user}"
+    private_key   = "${local.ssh_key}"
+    agent         = "${var.ssh_agent}"
+    bastion_host  = "${var.bastion_host}"
+  }
+
+  # Run stage hook commands
+  provisioner "remote-exec" {
+    inline = [
+      "${var.hooks["boot-preconfig"]}"
+    ]
+  }
+}
+
+# Local preinstall hook
+resource "null_resource" "local-preinstall-hook" {
+  depends_on = ["null_resource.icp-preinstall-hook"]
+  provisioner "local-exec" {
+    command = "${var.hooks["local-preinstall"]}"
+  }
+
+}
+
+#### End of Prereq for 2.4.0 ####
 
 ## Cluster Pre-config hook
 resource "null_resource" "icp-cluster-preconfig-hook-stop-on-fail" {

@@ -273,6 +273,9 @@ To avoid breaking existing templates which depends on the module it is recommend
 
 
 ### Versions and changes
+#### 2.4.1
+- Added missed prereq in the main.tf file
+
 #### 2.4.0
 - Add support for local hooks
 - Support specifying docker version when installing docker with apt (Ubuntu only)
