@@ -186,7 +186,7 @@ resource "null_resource" "local-preinstall-hook-stop-on-fail" {
   count = "${var.on_hook_failure == "fail" ? 1 : 0}"
 
   provisioner "local-exec" {
-    command = "${var.hooks["local-preinstall"]}"
+    command = "${var.local-hooks["local-preinstall"]}"
     on_failure = "fail"
   }
 }
@@ -195,7 +195,7 @@ resource "null_resource" "local-preinstall-hook-continue-on-fail" {
   count = "${var.on_hook_failure != "fail" ? 1 : 0}"
 
   provisioner "local-exec" {
-    command = "${var.hooks["local-preinstall"]}"
+    command = "${var.local-hooks["local-preinstall"]}"
     on_failure = "continue"
   }
 }
@@ -207,7 +207,7 @@ resource "null_resource" "local-postinstall-hook-stop-on-fail" {
   count = "${var.on_hook_failure == "fail" ? 1 : 0}"
 
   provisioner "local-exec" {
-    command = "${var.hooks["local-postinstall"]}"
+    command = "${var.local-hooks["local-postinstall"]}"
     on_failure = "fail"
   }
 }
@@ -216,7 +216,7 @@ resource "null_resource" "local-postinstall-hook-continue-on-fail" {
   count = "${var.on_hook_failure != "fail" ? 1 : 0}"
 
   provisioner "local-exec" {
-    command = "${var.hooks["local-postinstall"]}"
+    command = "${var.local-hooks["local-postinstall"]}"
     on_failure = "continue"
   }
 }

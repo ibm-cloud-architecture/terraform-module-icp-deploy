@@ -30,6 +30,7 @@ If the default SSH user is not the root user, the default user must have passwor
 |icp_priv_key        |               |No      |Private ssh key for ICP Boot master to connect to ICP Cluster. Only use when generate_key = false|
 | **Terraform installation process** |
 |hooks               | |No      |Hooks into different stages in the cluster setup process. See below for details|
+|local-hooks         | |No      |Locally run hooks at different stages in the cluster setup process. See below for details|
 |on_hook_failure     |fail  |    |Behavior when hooks fail. Anything other than `fail` will `continue`|
 |install-verbosity   | |No      | Verbosity of the icp ansible installer. -v to -vvvv. See ansible documentation for verbosity information |
 | **Terraform to cluster ssh configuration**|
@@ -72,7 +73,7 @@ So for exmaple
 
 ### Remote Execution Hooks
 It is possible to execute arbitrary commands between various phases of the cluster setup and installation process.
-Currently, the following hooks are defined
+Currently, the following hooks are defined. Each hook must be a list of commands to run.
 
 | Hook name          | Where executed | When executed                                              |
 |--------------------|----------------|------------------------------------------------------------|
@@ -84,7 +85,7 @@ Currently, the following hooks are defined
 
 ### Local Execution Hooks
 It is possible to execute arbitrary commands between various phases of the cluster setup and installation process.
-Currently, the following hooks are defined
+Currently, the following hooks are defined. Each hook must be a single command to run.
 
 | Hook name          | When executed                                              |
 |--------------------|------------------------------------------------------------|
