@@ -70,8 +70,9 @@ function ubuntu_docker_install {
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 
   # Right now hard code adding x86 repo
+  local arch=$(uname -m | sed -e 's/x86_64/amd64/g' -e 's/ppc64le/ppc64el/g')
   sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   "deb [arch=${arch}] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
    stable"
 
