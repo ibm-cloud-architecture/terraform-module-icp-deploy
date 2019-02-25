@@ -45,7 +45,8 @@ parse_icpversion ${image}
 echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
 
 # Make sure sourcedir exists, in case we need to donwload some archives
-mkdir -p ${sourcedir}
+sudo mkdir -p ${sourcedir}
+sudo chown $(whoami):$(whoami) ${sourcedir}
 
 if [[ ! -z ${image} ]]; then
   # Figure out the version
