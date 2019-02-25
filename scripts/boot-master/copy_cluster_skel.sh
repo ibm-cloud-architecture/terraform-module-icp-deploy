@@ -33,6 +33,8 @@ echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
 sudo mkdir -p ${target}
 sudo chown $(whoami):$(whoami) -R ${target}
 docker run -e LICENSE=accept -v ${target}:/data ${registry}${registry:+/}${org}/${repo}:${tag} cp -r cluster /data
+# Ensure that all data copied from installer has proper ownership
+sudo chown $(whoami):$(whoami) -R ${target}
 
 # Take a backup of original config file, to keep a record of original settings and comments
 cp ${target}/cluster/config.yaml ${target}/cluster/config.yaml-original
