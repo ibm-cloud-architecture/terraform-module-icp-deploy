@@ -59,6 +59,11 @@ variable "ssh_user" {
   default     = "root"
 }
 
+variable "cluster_dir_owner" {
+  description = "Username to own the ICP cluster directory after installation completes; defaults to ssh_user"
+  default     = ""
+}
+
 variable "ssh_key_base64" {
   description = "base64 encoded content of private ssh key"
   default     = ""
@@ -179,4 +184,6 @@ locals {
   cluster_size  = "${length(concat(var.icp-master, var.icp-proxy, var.icp-worker, var.icp-management))}"
   ssh_key       = "${base64decode(var.ssh_key_base64)}"
   boot-node     = "${element(compact(concat(list(var.boot-node),var.icp-master)), 0)}"
+
+  cluster_dir_owner = "${var.cluster_dir_owner == "" ? var.ssh_user : var.cluster_dir_owner}"
 }

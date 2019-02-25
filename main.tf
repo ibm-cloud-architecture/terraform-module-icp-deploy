@@ -295,7 +295,23 @@ resource "null_resource" "icp-worker-scaler" {
       "/tmp/icp-bootmaster-scripts/scaleworkers.sh ${var.icp-inception}"
     ]
   }
+}
 
+resource "null_resource" "icp-cluster-owner" {
+  depends_on = ["null_resource.icp-worker-scaler", "null_resource.icp-postinstall-hook-continue-on-fail", "null_resource.icp-postinstall-hook-stop-on-fail"]
 
+  # Change the owner of the cluster directory to the desired user
+  connection {
+    host          = "${local.boot-node}"
+    user          = "${var.ssh_user}"
+    private_key   = "${local.ssh_key}"
+    agent         = "${var.ssh_agent}"
+    bastion_host  = "${var.bastion_host}"
+  }
 
+  provisioner "remote-exec" {
+    inline = [
+      "sudo chown ${local.cluster_dir_owner}:${local.cluster_dir_owner} -R /opt/ibm/cluster/",
+    ]
+  }
 }
