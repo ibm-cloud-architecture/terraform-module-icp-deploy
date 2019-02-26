@@ -157,6 +157,11 @@ variable "boot-node" {
   default     = ""
 }
 
+variable "install-command" {
+  description = "Installer command to run"
+  default     = "install"
+}
+
 variable "install-verbosity" {
   description = "Verbosity of ansible installer output. -v to -vvvv where the maximum level includes connectivity information"
   default     = ""

@@ -33,6 +33,7 @@ If the default SSH user is not the root user, the default user must have passwor
 |local-hooks         | |No      |Locally run hooks at different stages in the cluster setup process. See below for details|
 |on_hook_failure     |fail  |    |Behavior when hooks fail. Anything other than `fail` will `continue`|
 |install-verbosity   | |No      | Verbosity of the icp ansible installer. -v to -vvvv. See ansible documentation for verbosity information |
+|install-command     |install |No      | Installer command to run |
 | **Terraform to cluster ssh configuration**|
 |ssh_user            |root           |No      |Username for Terraform to ssh into the ICP cluster. This is typically the default user with for the relevant cloud vendor|
 |ssh_key_base64      |               |No      |base64 encoded content of private ssh key|

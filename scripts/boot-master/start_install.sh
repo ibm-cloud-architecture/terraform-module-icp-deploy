@@ -1,7 +1,8 @@
 #!/bin/bash
 cluster_base="/opt/ibm"
+install_target="install"
 
-while getopts ":v:c:l:" arg; do
+while getopts ":v:c:l:t:" arg; do
     case "${arg}" in
       v)
         icp_version=${OPTARG}
@@ -11,6 +12,9 @@ while getopts ":v:c:l:" arg; do
         ;;
       l)
         log_verbosity=${OPTARG}
+        ;;
+      t)
+        install_target=${OPTARG}
         ;;
     esac
 done
@@ -28,5 +32,5 @@ fi
 parse_icpversion ${icp_version}
 echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
 
-docker run -e LICENSE=accept -e ANSIBLE_CALLBACK_WHITELIST=profile_tasks,timer --net=host -t -v ${cluster_base}/cluster:/installer/cluster ${registry}${registry:+/}${org}/${repo}:${tag} install ${log_verbosity} | tee /tmp/icp-install-log.txt
+docker run -e LICENSE=accept -e ANSIBLE_CALLBACK_WHITELIST=profile_tasks,timer --net=host -t -v ${cluster_base}/cluster:/installer/cluster ${registry}${registry:+/}${org}/${repo}:${tag} ${install_target} ${log_verbosity} | tee /tmp/icp-${install_target}-log.txt
 exit ${PIPESTATUS[0]}

@@ -227,7 +227,8 @@ resource "null_resource" "icp-generate-hosts-files" {
 locals {
   install_options = "${join(" -", list(""), compact(list(
     var.icp-inception       == "" ? "" : "v ${var.icp-inception}",
-    var.install-verbosity == "" ? "" : "l ${var.install-verbosity}"
+    var.install-verbosity == "" ? "" : "l ${var.install-verbosity}",
+    var.install-command == "" ? "" : "t ${var.install-command}"
   )))}"
 }
 # Start the installer
