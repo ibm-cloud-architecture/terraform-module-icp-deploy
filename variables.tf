@@ -1,4 +1,5 @@
 # Username and password for the initial admin user
+### ICP node topology
 variable "icp-master" {
   type        = "list"
   description =  "IP address of ICP Masters. First master will also be boot master. CE edition only supports single master "
@@ -23,6 +24,12 @@ variable "icp-management" {
   default     = []
 }
 
+variable "cluster_size" {
+  description = "Define total clustersize. Workaround for terraform issue #10857."
+}
+
+### ICP inception settings
+
 variable "image_location" {
   description = "NFS or HTTP location where image tarball can be accessed"
   default     = ""
@@ -44,15 +51,22 @@ variable "image_location_pass" {
   default     = ""
 }
 
-variable "docker_package_location" {
-  description = "http or nfs location of docker installer which ships with ICP. Option for RHEL which does not support docker-ce"
-  default     = ""
-}
-
 variable  "icp-inception" {
   description = "Version of ICP to provision. For example 3.1.2 or myuser:mypass@registry/ibmcom/icp-inception:3.1.2-ee"
   default = ""
 }
+
+variable "install-command" {
+  description = "Installer command to run"
+  default     = "install"
+}
+
+variable "install-verbosity" {
+  description = "Verbosity of ansible installer output. -v to -vvvv where the maximum level includes connectivity information"
+  default     = ""
+}
+
+### SSH CONNECTION DETAILS
 
 variable "ssh_user" {
   description = "Username to ssh into the ICP cluster. This is typically the default user with for the relevant cloud vendor"
@@ -74,7 +88,6 @@ variable "bastion_host" {
   default     = ""
 }
 
-
 variable "generate_key" {
   description = "Whether to generate a new ssh key for use by ICP Boot Master to communicate with other nodes"
   default     = true
@@ -90,12 +103,9 @@ variable "icp_priv_key" {
   default     = ""
 }
 
-variable "cluster_size" {
-  description = "Define total clustersize. Workaround for terraform issue #10857."
-}
+### ICP CONFIGURATION
 
 /*
-  ICP Configuration
   Configuration file is generated from items in the following order
   1. config.yaml shipped with ICP (if config_strategy = merge, else blank)
   2. config.yaml specified in icp_config_file
@@ -119,6 +129,18 @@ variable "config_strategy" {
 
 }
 
+variable "icp-host-groups" {
+  description = "Map of host groups and IPs in the cluster. Needs at least master, proxy and worker"
+  type        = "map"
+  default     = {}
+}
+
+variable "boot-node" {
+  description = "Node where ICP installer will be run from. Often first master node, but can be different"
+  default     = ""
+}
+
+### HOOKS
 
 variable "hooks" {
   description = "Hooks into different stages in the cluster setup process; each must be a list"
@@ -146,26 +168,7 @@ variable "on_hook_failure" {
   default     = "fail"
 }
 
-variable "icp-host-groups" {
-  description = "Map of host groups and IPs in the cluster. Needs at least master, proxy and worker"
-  type        = "map"
-  default     = {}
-}
-
-variable "boot-node" {
-  description = "Node where ICP installer will be run from. Often first master node, but can be different"
-  default     = ""
-}
-
-variable "install-command" {
-  description = "Installer command to run"
-  default     = "install"
-}
-
-variable "install-verbosity" {
-  description = "Verbosity of ansible installer output. -v to -vvvv where the maximum level includes connectivity information"
-  default     = ""
-}
+### DOCKER PARAMETERS
 
 variable "docker_image_name" {
   description = "Name of docker image to install; only supported for Ubuntu"
@@ -176,6 +179,13 @@ variable "docker_version" {
   description = "Version of docker image to install; only supported for Ubuntu"
   default = "latest"
 }
+
+variable "docker_package_location" {
+  description = "http or nfs location of docker installer which ships with ICP. Option for RHEL which does not support docker-ce"
+  default     = ""
+}
+
+### LOCAL VARIABLES
 
 locals {
   spec-icp-ips  = "${distinct(compact(concat(list(var.boot-node), var.icp-master, var.icp-proxy, var.icp-management, var.icp-worker)))}"
