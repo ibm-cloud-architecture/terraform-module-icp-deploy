@@ -10,20 +10,7 @@ exec 3>&1
 exec > >(tee -a ${LOGFILE} >/dev/null) 2> >(tee -a ${LOGFILE} >&3)
 
 echo "Script started with inputs $@"
-
-while getopts ":p:i:v:" arg; do
-    case "${arg}" in
-      p)
-        package_location=${OPTARG}
-        ;;
-      i)
-        docker_image=${OPTARG}
-        ;;
-      v)
-        docker_version=${OPTARG}
-        ;;
-    esac
-done
+source /tmp/icp-bootmaster-scripts/get-args.sh
 
 sourcedir=/tmp/icp-docker
 
@@ -98,27 +85,27 @@ then
 fi
 
 # Check if we're asked to install off-line or ICP provided docker bundle
-if [[ -z ${package_location} ]]
+if [[ -z ${docker_package_location} ]]
 then
   echo "Not required to install ICP provided docker."
 else
-  echo "Starting installation of ${package_location}"
+  echo "Starting installation of ${docker_package_location}"
   mkdir -p ${sourcedir}
 
   # Decide which protocol to use
-  if [[ "${package_location:0:3}" == "nfs" ]]
+  if [[ "${docker_package_location:0:3}" == "nfs" ]]
   then
     # Separate out the filename and path
-    nfs_mount=$(dirname ${package_location:4})
-    package_file="${sourcedir}/$(basename ${package_location})"
+    nfs_mount=$(dirname ${docker_package_location:4})
+    package_file="${sourcedir}/$(basename ${docker_package_location})"
     # Mount
     sudo mount.nfs $nfs_mount $sourcedir
-  elif [[ "${package_location:0:4}" == "http" ]]
+  elif [[ "${docker_package_location:0:4}" == "http" ]]
   then
     # Figure out what we should name the file
     filename="icp-docker.bin"
     mkdir -p ${sourcedir}
-    curl -o ${sourcedir}/${filename} "${package_location#http:}"
+    curl -o ${sourcedir}/${filename} "${docker_package_location#http:}"
     package_file="${sourcedir}/${filename}"
   fi
 

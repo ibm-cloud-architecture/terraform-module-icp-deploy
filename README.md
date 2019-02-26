@@ -34,6 +34,8 @@ If the default SSH user is not the root user, the default user must have passwor
 |on_hook_failure     |fail  |    |Behavior when hooks fail. Anything other than `fail` will `continue`|
 |install-verbosity   | |No      | Verbosity of the icp ansible installer. -v to -vvvv. See ansible documentation for verbosity information |
 |install-command     |install |No      | Installer command to run |
+|cluster-directory   |/opt/ibm/cluster |No      | Location to use for the cluster directory |
+cluster-directory
 | **Terraform to cluster ssh configuration**|
 |ssh_user            |root           |No      |Username for Terraform to ssh into the ICP cluster. This is typically the default user with for the relevant cloud vendor|
 |ssh_key_base64      |               |No      |base64 encoded content of private ssh key|
@@ -303,6 +305,9 @@ To avoid breaking existing templates which depends on the module it is recommend
 
 
 ### Versions and changes
+- Allow cluster directory to be specified
+- Allow other targets to be called from `icp-inception`
+
 #### 3.0.8
 - Fix docker install from yum repo for non-root user on RHEL
 

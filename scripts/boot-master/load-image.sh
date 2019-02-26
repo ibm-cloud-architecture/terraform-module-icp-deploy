@@ -6,51 +6,23 @@ exec > >(tee -a ${LOGFILE} >/dev/null) 2> >(tee -a ${LOGFILE} >&3)
 echo "Got the parameters $@"
 # Defaults
 source /tmp/icp-bootmaster-scripts/functions.sh
-sourcedir=/opt/ibm/cluster/images
+source /tmp/icp-bootmaster-scripts/get-args.sh
 declare -a locations
 
-# Parse options
-while getopts ":l:i:s:u:p:" opt; do
-  case $opt in
-    l)
-      locations+=( ${OPTARG} )
-      ;;
-    u)
-      username=${OPTARG}
-      ;;
-    p)
-      password=${OPTARG}
-      ;;
-    i)
-      image=${OPTARG}
-      ;;
-    s)
-      echo "Will overwrite default sourcedir to ${OPTARG}"
-      sourcedir=${OPTARG}
-      ;;
-    \?)
-      echo "Invalid option : -$OPTARG in commmand $0 $*" >&2
-      exit 1
-      ;;
-    :)
-      echo "Missing option argument for -$OPTARG in command $0 $*" >&2
-      exit 1
-      ;;
-  esac
-done
+sourcedir=${cluster_dir}/images
 
 # Figure out the version
 # This will populate $org $repo and $tag
-parse_icpversion ${image}
+parse_icpversion ${icp_inception}
 echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
 
 # Make sure sourcedir exists, in case we need to donwload some archives
 mkdir -p ${sourcedir}
 
-if [[ ! -z ${image} ]]; then
+if [[ ! -z ${icp_inception} ]]; then
   # Figure out the version
   # This will populate $org $repo and $tag
-  parse_icpversion ${image}
+  parse_icpversion ${icp_inception}
   echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
 fi
 

@@ -1,8 +1,18 @@
-import os, json, ConfigParser
+import os, sys, json, ConfigParser
 
 hgfile = '/tmp/icp-host-groups.json'
-hostfile = '/opt/ibm/cluster/hosts'
+hostfile = None
 ipfile = '/tmp/cluster-ips.txt'
+
+supplied_cluster_dir = ""
+if len(sys.argv) > 1:
+  supplied_cluster_dir = sys.argv[1]
+  hostfile = os.path.join(supplied_cluster_dir,"/hosts")
+  if not os.path.isdir(supplied_cluster_dir):
+    hostfile = None
+
+if hostfile is None:
+    raise Exception("Invalid cluster directory provided: {}".format(supplied_cluster_dir))
 
 # Exit if we don't need to do anything
 if os.stat(hgfile).st_size == 0:

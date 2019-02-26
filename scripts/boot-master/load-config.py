@@ -1,14 +1,14 @@
 #!/bin/env python
 import os, sys, yaml, json, getpass
-cf = '/tmp/config.yaml'
-ci = '/tmp/items-config.yaml'
-co = '/opt/ibm/cluster/config.yaml'
+config_file = '/tmp/config.yaml'
+config_items = '/tmp/items-config.yaml'
+config_orig = None
 
 # Load config from config file if provided
-if os.stat(cf).st_size == 0:
+if os.stat(config_file).st_size == 0:
   config_f = {}
 else:
-  with open(cf, 'r') as stream:
+  with open(config_file, 'r') as stream:
     try:
         config_f = yaml.load(stream)
     except yaml.YAMLError as exc:
@@ -16,13 +16,23 @@ else:
 
 
 # Load config items if provided
-with open(ci, 'r') as stream:
+with open(config_items, 'r') as stream:
   config_i = json.load(stream)
 
-# If merging changes, start by loading default values. Else start with empty dict
+supplied_cluster_dir = ""
 if len(sys.argv) > 1:
-  if sys.argv[1] == "merge":
-    with open(co, 'r') as stream:
+  supplied_cluster_dir = sys.argv[1]
+  config_orig = os.path.join(supplied_cluster_dir,"/config.yaml")
+  if not os.path.exists(config_orig):
+    config_orig = None
+
+if config_orig is None:
+    raise Exception("Invalid cluster directory provided: {}".format(supplied_cluster_dir))
+
+# If merging changes, start by loading default values. Else start with empty dict
+if len(sys.argv) > 2:
+  if sys.argv[2] == "merge":
+    with open(config_orig, 'r') as stream:
       try:
         config_o = yaml.load(stream)
       except yaml.YAMLError as exc:
@@ -46,7 +56,10 @@ if not 'ansible_user' in config_o and getpass.getuser() != 'root':
 if ((not 'default_admin_password' in config_f and
     not 'default_admin_password' in config_i) or
         config_o['default_admin_password'] == ''):
-    config_o['default_admin_password'] = sys.argv[2]
+    if len(sys.argv) > 3:
+      config_o['default_admin_password'] = sys.argv[3]
+    else:
+      raise Exception("default_admin_password not set and none provided from terraform")
 
 # to handle terraform bug regarding booleans, we must parse dictionaries to find strings "true" or "false"
 # and convert them to booleans.
@@ -80,5 +93,5 @@ def parsedict(d):
 
 
 # Write the new configuration
-with open(co, 'w') as of:
+with open(config_orig, 'w') as of:
   yaml.safe_dump(parsedict(config_o), of, explicit_start=True, default_flow_style = False)

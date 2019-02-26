@@ -1,24 +1,5 @@
 #!/bin/bash
-cluster_base="/opt/ibm"
-install_target="install"
-
-while getopts ":v:c:l:t:" arg; do
-    case "${arg}" in
-      v)
-        icp_version=${OPTARG}
-        ;;
-      c)
-        cluster_base=${OPTARG}
-        ;;
-      l)
-        log_verbosity=${OPTARG}
-        ;;
-      t)
-        install_target=${OPTARG}
-        ;;
-    esac
-done
-
+source /tmp/icp-bootmaster-scripts/get-args.sh
 source /tmp/icp-bootmaster-scripts/functions.sh
 
 
@@ -32,5 +13,5 @@ fi
 parse_icpversion ${icp_version}
 echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
 
-docker run -e LICENSE=accept -e ANSIBLE_CALLBACK_WHITELIST=profile_tasks,timer --net=host -t -v ${cluster_base}/cluster:/installer/cluster ${registry}${registry:+/}${org}/${repo}:${tag} ${install_target} ${log_verbosity} | tee /tmp/icp-${install_target}-log.txt
+docker run -e LICENSE=accept -e ANSIBLE_CALLBACK_WHITELIST=profile_tasks,timer --net=host -t -v ${cluster_dir}:/installer/cluster ${registry}${registry:+/}${org}/${repo}:${tag} ${install_target} ${log_verbosity} | tee /tmp/icp-${install_target}-log.txt
 exit ${PIPESTATUS[0]}

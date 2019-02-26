@@ -1,14 +1,13 @@
 #!/bin/bash
+source /tmp/icp-bootmaster-scripts/get-args.sh
 source /tmp/icp-bootmaster-scripts/functions.sh
 
-ICPDIR=/opt/ibm/cluster
 NEWLIST=/tmp/workerlist.txt
-OLDLIST=/opt/ibm/cluster/workerlist.txt
+OLDLIST=${cluster_dir}/workerlist.txt
 
 # Figure out the version
 # This will populate $org $repo and $tag
 parse_icpversion ${1}
-
 
 # Compare new and old list of workers
 declare -a newlist
@@ -65,7 +64,7 @@ then
   ### Setup kubectl
 
   # use kubectl from container
-  kubectl="sudo docker run -e LICENSE=accept --net=host -v /opt/ibm/cluster:/installer/cluster -v /root:/root ${registry}${registry:+/}${org}/${repo}:${tag} kubectl"
+  kubectl="sudo docker run -e LICENSE=accept --net=host -v ${cluster_dir}:/installer/cluster -v /root:/root ${registry}${registry:+/}${org}/${repo}:${tag} kubectl"
 
   $kubectl config set-cluster cfc-cluster --server=https://localhost:8001 --insecure-skip-tls-verify=true
   $kubectl config set-context kubectl --cluster=cfc-cluster
@@ -78,7 +77,7 @@ then
   for ip in "${removed[@]}"; do
     $kubectl delete node $ip
     sudo sed -i "/^${ip} /d" /etc/hosts
-    sudo sed -i "/^${ip} /d" /opt/ibm/cluster/hosts
+    sudo sed -i "/^${ip} /d" ${cluster_dir}/hosts
   done
 
 fi
@@ -90,13 +89,13 @@ then
 
   # Update /etc/hosts
   for node in "${added[@]}" ; do
-    nodename=$(ssh -o StrictHostKeyChecking=no -i ${ICPDIR}/ssh_key ${node} hostname)
+    nodename=$(ssh -o StrictHostKeyChecking=no -i ${cluster_dir}/ssh_key ${node} hostname)
     printf "%s     %s\n" "$node" "$nodename" | cat - /etc/hosts | sudo sponge /etc/hosts
-    printf "%s     %s\n" "$node" "$nodename" | ssh -o StrictHostKeyChecking=no -i ${ICPDIR}/ssh_key ${node} 'cat - /etc/hosts | sudo sponge /etc/hosts'
+    printf "%s     %s\n" "$node" "$nodename" | ssh -o StrictHostKeyChecking=no -i ${cluster_dir}/ssh_key ${node} 'cat - /etc/hosts | sudo sponge /etc/hosts'
   done
 
   list=$(IFS=, ; echo "${added[*]}")
-  docker run -e LICENSE=accept --net=host -v "/opt/ibm/cluster":/installer/cluster \
+  docker run -e LICENSE=accept --net=host -v "${cluster_dir}":/installer/cluster \
   ${registry}${registry:+/}${org}/${repo}:${tag} install -l ${list}
 fi
 

@@ -51,6 +51,11 @@ variable "image_location_pass" {
   default     = ""
 }
 
+variable "cluster-directory" {
+  description = "Location to use for the cluster directory"
+  default     = "/opt/ibm/cluster"
+}
+
 variable  "icp-inception" {
   description = "Version of ICP to provision. For example 3.1.2 or myuser:mypass@registry/ibmcom/icp-inception:3.1.2-ee"
   default = ""
