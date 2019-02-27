@@ -74,6 +74,7 @@ resource "null_resource" "icp-docker" {
     inline = [
       "mkdir -p /tmp/icp-bootmaster-scripts",
       "sudo mkdir -p /opt/ibm/cluster",
+      "sudo chown ${var.ssh_user} /opt/ibm",
       "sudo chown ${var.ssh_user} /opt/ibm/cluster"
     ]
   }
