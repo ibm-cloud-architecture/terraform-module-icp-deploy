@@ -73,6 +73,11 @@ for image_location in ${locations[@]} ; do
 
     fi
 
+    if [[ -f "${sourcedir}/${filename}" ]]; then
+      image_file="${sourcedir}/${filename}"
+      break
+    fi
+
     # Download the file using auth if provided
     echo "Downloading ${image_location}" >&2
     echo "This can take a very long time" >&2
