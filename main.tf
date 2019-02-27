@@ -85,6 +85,12 @@ resource "null_resource" "icp-docker" {
     agent         = "${var.ssh_agent}"
     bastion_host  = "${var.bastion_host}"
   }
+  
+  provisioner "remote-exec" {
+    inline = [
+      "mkdir -p /tmp/icp-bootmaster-scripts"
+    ]
+  }
 
   provisioner "file" {
     source      = "${path.module}/scripts/boot-master/"
@@ -288,7 +294,4 @@ resource "null_resource" "icp-worker-scaler" {
       "/tmp/icp-bootmaster-scripts/scaleworkers.sh ${var.icp-inception}"
     ]
   }
-
-
-
 }

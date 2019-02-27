@@ -1,6 +1,6 @@
 #!/bin/bash
 
-while getopts ":i:d:v:c:l:u:p:" arg; do
+while getopts ":i:d:v:c:l:u:p:o:k:s:" arg; do
     case "${arg}" in
       i)
         icp_inception=${OPTARG}
@@ -32,7 +32,6 @@ while getopts ":i:d:v:c:l:u:p:" arg; do
       s)
         docker_version=${OPTARG}
         ;;
-    esac
       \?)
         echo "Invalid option : -$OPTARG in commmand $0 $*" >&2
         exit 1
