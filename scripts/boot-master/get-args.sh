@@ -7,6 +7,14 @@ while getopts ":i:d:v:c:l:u:p:o:k:s:" arg; do
         ;;
       d)
         cluster_dir=${OPTARG}
+        if [ ! -d "$cluster_dir" ]; then
+          sudo mkdir -p ${cluster_dir}
+        fi
+        if [ ! -f /CLUSTER_DIR_REACHABLE ]; then
+          f=${cluster_dir}
+          while [[ $f != / ]]; do chmod a+x \"$f\"; f=$(dirname \"$f\"); done;
+          sudo touch /CLUSTER_DIR_REACHABLE
+        fi
         ;;
       v)
         log_verbosity=${OPTARG}

@@ -10,14 +10,13 @@ source /tmp/icp-bootmaster-scripts/get-args.sh
 declare -a locations
 
 sourcedir=${cluster_dir}/images
+# Make sure sourcedir exists, in case we need to donwload some archives
+mkdir -p ${sourcedir}
 
 # Figure out the version
 # This will populate $org $repo and $tag
 parse_icpversion ${icp_inception}
 echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
-
-# Make sure sourcedir exists, in case we need to donwload some archives
-mkdir -p ${sourcedir}
 
 if [[ ! -z ${icp_inception} ]]; then
   # Figure out the version
@@ -66,7 +65,6 @@ for image_location in ${locations[@]} ; do
     # Separate out the filename and path
     nfs_mount=$(dirname ${image_location})
     image_file="${sourcedir}/$(basename ${image_location})"
-    mkdir -p ${sourcedir}
     # Mount
     sudo mount.nfs $nfs_mount $sourcedir
 

@@ -20,7 +20,6 @@ echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
 
 # Copy the default data to the cluster directory
 docker run -e LICENSE=accept -v /tmp/icp:/data ${registry}${registry:+/}${org}/${repo}:${tag} cp -r cluster /data
-sudo mkdir -p ${cluster_dir}
 sudo mv /tmp/icp/cluster ${cluster_dir}
 sudo chown $(whoami):$(whoami) -R ${cluster_dir}
 
