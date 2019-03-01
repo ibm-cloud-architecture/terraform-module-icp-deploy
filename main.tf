@@ -181,16 +181,11 @@ resource "null_resource" "icp-config" {
       destination = "${var.cluster-directory}/ssh_key"
   }
 
-  provisioner "remote-exec" {
-    inline = [
-      "chmod 600 ${var.cluster-directory}/cluster/ssh_key",
-    ]
-  }
-
   # Since the file provisioner deals badly with empty lists, we'll create the optional management nodes differently
   # Later we may refactor to use this method for all node types for consistency
   provisioner "remote-exec" {
     inline = [
+      "chmod 600 ${var.cluster-directory}/cluster/ssh_key",
       "echo -n ${join(",", var.icp-master)} > ${var.cluster-directory}/masterlist.txt",
       "echo -n ${join(",", var.icp-proxy)} > ${var.cluster-directory}/proxylist.txt",
       "echo -n ${join(",", var.icp-worker)} > ${var.cluster-directory}/workerlist.txt",
