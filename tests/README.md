@@ -15,7 +15,7 @@ To run the tests you'll need the following installed
 
 - [BATS](https://github.com/bats-core/bats-core)
 - [Terraform](https://www.terraform.io/)
-- Docker
+- Docker (it must be running)
 
 ## Running tests
 

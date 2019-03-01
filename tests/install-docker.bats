@@ -10,7 +10,7 @@ load helpers
   run run_in_docker \
     -i ${IMAGE} \
     -s "/tmp/icp-bootmaster-scripts/install-docker.sh" \
-    -p "-i docker-ce -v latest" \
+    -p "-k docker-ce -s latest" \
     -t "docker --version"
   [ $status -eq 0 ]
 }
@@ -19,7 +19,7 @@ load helpers
   run run_in_docker \
     -i ${IMAGE} \
     -s "/tmp/icp-bootmaster-scripts/install-docker.sh" \
-    -p "-i docker-ce -v 18.06.1" \
+    -p "-k docker-ce -s 18.06.1" \
     -t "docker --version"
   [ $status -eq 0 ]
 }
@@ -29,7 +29,7 @@ load helpers
   run run_in_docker \
     -i ${IMAGE} \
     -s "/tmp/icp-bootmaster-scripts/install-docker.sh" \
-    -p "-i docker-ce -v 3.1.1" \
+    -p "-k docker-ce -s 3.1.1" \
     -t "docker --version"
   [ $status -gt 0 ]
 }
