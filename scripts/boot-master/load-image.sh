@@ -9,9 +9,8 @@ source /tmp/icp-bootmaster-scripts/functions.sh
 source /tmp/icp-bootmaster-scripts/get-args.sh
 declare -a locations
 
-sourcedir=${cluster_dir}/images
-# Make sure sourcedir exists, in case we need to donwload some archives
-mkdir -p ${sourcedir}
+
+
 
 # Figure out the version
 # This will populate $org $repo and $tag
@@ -28,6 +27,8 @@ fi
 # Allow downloading multiple tarballs,
 # which is required in multi-arch deployments
 for image_location in ${locations[@]} ; do
+  imagedir=${cluster_dir}/images
+  ensure_directory_reachable ${imagedir}
 
   # Detect which protocol to use
   if [[ "${image_location:0:4}" == "http" ]]; then
@@ -48,7 +49,7 @@ for image_location in ${locations[@]} ; do
     echo "Downloading ${image_location}" >&2
     echo "This can take a very long time" >&2
     wget -nv --continue ${username:+--user} ${username} ${password:+--password} ${password} \
-     -O ${sourcedir}/${filename} "${image_location}"
+     -O ${imagedir}/${filename} "${image_location}"
 
     if [[ $? -gt 0 ]]; then
       echo "Error downloading ${image_location}" >&2
@@ -57,16 +58,16 @@ for image_location in ${locations[@]} ; do
 
     # Set the image file name if we're on the same platform
     if [[ ${filename} =~ .*$(uname -m).* ]]; then
-      echo "Setting image_file to ${sourcedir}/${filename}"
-      image_file="${sourcedir}/${filename}"
+      echo "Setting image_file to ${imagedir}/${filename}"
+      image_file="${imagedir}/${filename}"
     fi
   else
     # Assume NFS since this is the only other supported protocol
     # Separate out the filename and path
     nfs_mount=$(dirname ${image_location})
-    image_file="${sourcedir}/$(basename ${image_location})"
+    image_file="${imagedir}/$(basename ${image_location})"
     # Mount
-    sudo mount.nfs $nfs_mount $sourcedir
+    sudo mount.nfs $nfs_mount $imagedir
 
   fi
 done

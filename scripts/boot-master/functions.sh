@@ -58,3 +58,15 @@ function get_inception_image() {
   image=$(docker image list | grep -m 1 inception | awk '{ print $1 ":" $2 }')
   echo $image
 }
+
+function ensure_directory_reachable() {
+  # Ensure that the directory exists and is reachable:
+  # 1) It is owned by the current user
+  # 2) All parent directories are executable
+  if [ ! -d "${1}" ]; then
+  sudo mkdir -p ${1}
+  sudo chown ${whoami}:${whoami} ${1}
+  f=${1}
+  while [[ $f != / ]]; do sudo chmod a+x "$f"; f=$(dirname "$f"); done;
+  sudo touch /CLUSTER_DIR_REACHABLE
+}
