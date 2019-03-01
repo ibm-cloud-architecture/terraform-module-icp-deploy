@@ -292,8 +292,8 @@ resource "null_resource" "icp-worker-scaler" {
     inline = [
       "chmod a+x /tmp/icp-bootmaster-scripts/scaleworkers.sh",
       "sudo chown ${var.ssh_user}:${var.ssh_user} -R ${var.cluster-directory}",
-      "/tmp/icp-bootmaster-scripts/scaleworkers.sh ${var.icp-inception}"
-      "sudo chown ${local.cluster_dir_owner}:${local.cluster_dir_owner} -R ${var.cluster-directory}",
+      "/tmp/icp-bootmaster-scripts/scaleworkers.sh ${var.icp-inception}",
+      "sudo chown ${local.cluster_dir_owner}:${local.cluster_dir_owner} -R ${var.cluster-directory}"
     ]
   }
 }
