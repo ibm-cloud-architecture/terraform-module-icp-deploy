@@ -170,7 +170,7 @@ resource "null_resource" "icp-config" {
 
   provisioner "remote-exec" {
     inline = [
-      "/tmp/icp-bootmaster-scripts/copy_cluster_skel.sh ${var.icp-inception == "" ? "" : " -v ${var.icp-inception}"}",
+      "/tmp/icp-bootmaster-scripts/copy_cluster_skel.sh ${local.script_options}",
       "python /tmp/icp-bootmaster-scripts/load-config.py ${var.cluster-directory} ${var.config_strategy} ${random_string.generated_password.result}"
     ]
   }

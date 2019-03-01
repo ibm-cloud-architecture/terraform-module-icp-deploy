@@ -35,7 +35,6 @@ If the default SSH user is not the root user, the default user must have passwor
 |install-verbosity   | |No      | Verbosity of the icp ansible installer. -v to -vvvv. See ansible documentation for verbosity information |
 |install-command     |install |No      | Installer command to run |
 |cluster-directory   |/opt/ibm/cluster |No      | Location to use for the cluster directory |
-cluster-directory
 | **Terraform to cluster ssh configuration**|
 |ssh_user            |root           |No      |Username for Terraform to ssh into the ICP cluster. This is typically the default user with for the relevant cloud vendor|
 |ssh_key_base64      |               |No      |base64 encoded content of private ssh key|
