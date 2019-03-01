@@ -13,5 +13,6 @@ fi
 parse_icpversion ${icp_version}
 echo "registry=${registry:-not specified} org=$org repo=$repo tag=$tag"
 
-docker run -e LICENSE=accept -e ANSIBLE_CALLBACK_WHITELIST=profile_tasks,timer --net=host -t -v ${cluster_dir}:/installer/cluster ${registry}${registry:+/}${org}/${repo}:${tag} ${install_target} ${log_verbosity} | tee /tmp/icp-${install_target}-log.txt
+docker run -e LICENSE=accept -e ANSIBLE_CALLBACK_WHITELIST=profile_tasks,timer --net=host -t -v ${cluster_dir}:/installer/cluster ${registry}${registry:+/}${org}/${repo}:${tag} ${install_target} ${log_verbosity} |& tee /tmp/icp-${install_target}-log.txt
+
 exit ${PIPESTATUS[0]}
