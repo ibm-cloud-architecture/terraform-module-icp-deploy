@@ -22,16 +22,15 @@ with open(config_items, 'r') as stream:
 supplied_cluster_dir = ""
 if len(sys.argv) > 1:
   supplied_cluster_dir = sys.argv[1]
-  config_orig = os.path.join(supplied_cluster_dir,"/config.yaml")
+  config_orig = os.path.join(supplied_cluster_dir,"config.yaml")
   if not os.path.exists(config_orig):
     config_orig = None
-
-if config_orig is None:
-    raise Exception("Invalid cluster directory provided: {}".format(supplied_cluster_dir))
 
 # If merging changes, start by loading default values. Else start with empty dict
 if len(sys.argv) > 2:
   if sys.argv[2] == "merge":
+    if config_orig is None:
+        raise Exception("Invalid cluster directory provided: {}\n\tconfig.yaml could not be found.".format(supplied_cluster_dir))
     with open(config_orig, 'r') as stream:
       try:
         config_o = yaml.load(stream)
