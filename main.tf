@@ -178,18 +178,19 @@ resource "null_resource" "icp-config" {
   # Copy the provided or generated private key
   provisioner "file" {
       content = "${var.generate_key ? tls_private_key.icpkey.private_key_pem : var.icp_priv_key}"
-      destination = "${var.cluster-directory}/ssh_key"
+      destination = "/tmp/icp/cluster/ssh_key"
   }
 
   # Since the file provisioner deals badly with empty lists, we'll create the optional management nodes differently
   # Later we may refactor to use this method for all node types for consistency
   provisioner "remote-exec" {
     inline = [
-      "chmod 600 ${var.cluster-directory}/cluster/ssh_key",
-      "echo -n ${join(",", var.icp-master)} > ${var.cluster-directory}/masterlist.txt",
-      "echo -n ${join(",", var.icp-proxy)} > ${var.cluster-directory}/proxylist.txt",
-      "echo -n ${join(",", var.icp-worker)} > ${var.cluster-directory}/workerlist.txt",
-      "echo -n ${join(",", var.icp-management)} > ${var.cluster-directory}/managementlist.txt"
+      "echo -n ${join(",", var.icp-master)} > /tmp/icp/cluster/masterlist.txt",
+      "echo -n ${join(",", var.icp-proxy)} > /tmp/icp/cluster/proxylist.txt",
+      "echo -n ${join(",", var.icp-worker)} > /tmp/icp/cluster/workerlist.txt",
+      "echo -n ${join(",", var.icp-management)} > /tmp/icp/cluster/managementlist.txt",
+      "mv -f /tmp/icp/cluster/* ${var.cluster-directory}/",
+      "chmod 600 ${var.cluster-directory}/ssh_key"
     ]
   }
 
@@ -217,7 +218,7 @@ resource "null_resource" "icp-generate-hosts-files" {
 
   provisioner "remote-exec" {
     inline = [
-      "/tmp/icp-bootmaster-scripts/generate_hostsfiles.sh"
+      "/tmp/icp-bootmaster-scripts/generate_hostsfiles.sh ${local.script_options}"
     ]
   }
 }

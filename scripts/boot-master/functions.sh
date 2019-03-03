@@ -38,7 +38,7 @@ function parse_icpversion() {
   then
     # We should autodetect the version if loaded from tarball
     # For now we grab the first matching image in docker image list.
-    read -r repo tag <<<$(docker image list | awk -v pat=$DefaultRepo ' $1 ~ pat { print $1 " " $2 ; exit }')
+    read -r repo tag <<<$(sudo docker image list | awk -v pat=$DefaultRepo ' $1 ~ pat { print $1 " " $2 ; exit }')
 
     # As a last resort we'll use the latest tag from docker hub
     if [[ -z $tag ]]; then
@@ -55,7 +55,7 @@ function parse_icpversion() {
 function get_inception_image() {
   # In cases where inception image has not been specified
   # we may look for inception image locally
-  image=$(docker image list | grep -m 1 inception | awk '{ print $1 ":" $2 }')
+  image=$(sudo docker image list | grep -m 1 inception | awk '{ print $1 ":" $2 }')
   echo $image
 }
 

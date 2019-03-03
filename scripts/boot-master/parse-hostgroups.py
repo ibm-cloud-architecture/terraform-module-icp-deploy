@@ -7,7 +7,7 @@ ipfile = '/tmp/cluster-ips.txt'
 supplied_cluster_dir = ""
 if len(sys.argv) > 1:
   supplied_cluster_dir = sys.argv[1]
-  hostfile = os.path.join(supplied_cluster_dir,"/hosts")
+  hostfile = os.path.join(supplied_cluster_dir,"hosts")
   if not os.path.isdir(supplied_cluster_dir):
     hostfile = None
 

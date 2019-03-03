@@ -100,7 +100,7 @@ read_from_groupfiles() {
 
 read_from_hostgroups() {
   # First parse the hostgroup json
-  python /tmp/icp-bootmaster-scripts/parse-hostgroups.py
+  python /tmp/icp-bootmaster-scripts/parse-hostgroups.py ${cluster_dir}
 
   # Get the cluster ips
   declare -a cluster_ips

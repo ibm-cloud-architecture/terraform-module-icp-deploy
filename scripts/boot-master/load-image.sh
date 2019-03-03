@@ -91,9 +91,7 @@ else
   # If we don't have an image locally we'll pull from docker registry
   if [[ -z $(docker images -q ${registry}${registry:+/}${org}/${repo}:${tag}) ]]; then
     # If this is a private registry we may need to log in
-    if [[ ! -z "$username" ]]; then
-      docker login -u ${username} -p ${password} ${registry}
-    fi
+    [[ ! -z "$username" ]] && [[ ! -z "$password" ]] && docker login -u ${username} -p ${password} ${registry}
     # ${registry}${registry:+/} adds <registry>/ only if registry is specified
     docker pull ${registry}${registry:+/}${org}/${repo}:${tag}
   fi
