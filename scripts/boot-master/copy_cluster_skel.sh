@@ -25,4 +25,4 @@ ensure_directory_reachable ${cluster_dir}
 sudo mv /tmp/icp/cluster/* ${cluster_dir}
 
 # Take a backup of original config file, to keep a record of original settings and comments
-cp ${cluster_dir}/config.yaml ${cluster_dir}/config.yaml-original
+sudo cp ${cluster_dir}/config.yaml ${cluster_dir}/config.yaml-original
