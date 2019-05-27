@@ -7,7 +7,7 @@ OLDLIST=${cluster_dir}/workerlist.txt
 
 # Figure out the version
 # This will populate $org $repo and $tag
-parse_icpversion ${1}
+parse_icpversion ${icp_inception}
 
 # Compare new and old list of workers
 declare -a newlist
@@ -96,7 +96,7 @@ then
 
   list=$(IFS=, ; echo "${added[*]}")
   docker run -e LICENSE=accept --net=host -v "${cluster_dir}":/installer/cluster \
-  ${registry}${registry:+/}${org}/${repo}:${tag} install -l ${list}
+  ${registry}${registry:+/}${org}/${repo}:${tag} worker -l ${list}
 fi
 
 
